@@ -1,0 +1,43 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width-device-width, initial-scale=1">
+	<title>synthics</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<header>
+	</header>
+	<div class="wrap">
+		<div class="phys1">
+			<h2 class="hp">Simulation 1</h2>
+			<select class="phys1_sel">
+				<option value="ball">Ball</option>
+				<option value="multi_ball">Multi Ball</option> //multiple balls that can trigger on impact of faceted surface that can rotate
+				<option value="pendulum">Pendulum</option>
+			</select>
+			<input type="button" value="Drop" class="phys1_drop">
+			<canvas class="phys_canvas" id="phys1_scene" width="120" height="120"></canvas>
+		</div>
+
+		<div class="phys2">
+			<h2 class="hp">Simulation 2</h2>
+			<select class="phys2_sel">
+				<option value="ball">Ball</option>
+				<option value="multi_ball">Multi Ball</option>
+				<option value="pendulum">Pendulum</option>
+			</select>
+			<input type="button" value="Drop" class="phys2_drop">
+			<canvas class="phys_canvas" id="phys2_scene" width="120" height="120"></canvas>
+		</div>
+	</div>
+
+	<script>
+		//GLOBAL VARIABLES
+		var phys1_canvas, phys2_canvas;
+	</script>
+</body>
+
+</html>
