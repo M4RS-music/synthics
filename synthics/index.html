@@ -1,5 +1,5 @@
+<!DOCTYPE html>
 <html>
-
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width-device-width, initial-scale=1">
@@ -11,32 +11,75 @@
 	<header>
 	</header>
 	<div class="wrap">
-		<div class="phys1">
-			<h2 class="hp">Simulation 1</h2>
-			<select class="phys1_sel">
-				<option value="ball">Ball</option>
-				<option value="multi_ball">Multi Ball</option> //multiple balls that can trigger on impact of faceted surface that can rotate
-				<option value="pendulum">Pendulum</option>
-			</select>
-			<input type="button" value="Drop" class="phys1_drop">
-			<canvas class="phys_canvas" id="phys1_scene" width="120" height="120"></canvas>
-		</div>
-
-		<div class="phys2">
-			<h2 class="hp">Simulation 2</h2>
-			<select class="phys2_sel">
-				<option value="ball">Ball</option>
-				<option value="multi_ball">Multi Ball</option>
-				<option value="pendulum">Pendulum</option>
-			</select>
-			<input type="button" value="Drop" class="phys2_drop">
-			<canvas class="phys_canvas" id="phys2_scene" width="120" height="120"></canvas>
-		</div>
+		<canvas id="scene" width="900" height="900" style="border-bottom-width: 1px;border-bottom-style: solid;border-left-width: 1px;border-left-style: solid;border-top-width: 1px;border-top-style: solid;border-right-width: 1px;border-right-style: solid;"></canvas>
 	</div>
 
 	<script>
 		//GLOBAL VARIABLES
-		var phys1_canvas, phys2_canvas;
+		var canvas, ctx, width, height, boxes = [], balls = [], numberBalls, drag, bounce, gravity;
+		numberBalls = 1;
+		
+		//OBJECTS
+		function Ball(rad, x, y, vx, vy, color){
+			this.rad = rad;
+			this.x = x;
+			this.y = y;
+			this.vx = vx;
+			this.vy =vy;
+			this.color = color;
+			this.update = function(){
+				if(this.x <= 0 || this.x >= width) this.vx = -this.vx * bounce;
+				if(this.y <= 0 || this.y >= height) this.vy = -this.vy * bounce;
+				
+				this.x += this.vx;
+				this.y += this.vy;
+				console.log(this.y);
+				//console.log("update");
+
+			}
+			this.render = function(ctx){
+				ctx.beginPath();
+				ctx.fillStyle = this.color;
+				ctx.arc(this.x, this.y, this.rad, 0, Math.PI * 2);
+				ctx.closePath();
+				ctx.fill();
+				//console.log("render");
+			}
+		}
+		
+		//FUNCTIONS
+		function clear(){
+			ctx.clearRect(0,0,width,height);
+		}
+		
+		function game(){
+			clear();
+			for(var i=0; i<numberBalls; i++){
+				var b = balls[i];
+				b.update();
+				b.render(ctx);
+			}
+			
+		}
+		//INIT
+		document.addEventListener("DOMContentLoaded", function(){
+			canvas = document.getElementById("scene");
+			ctx = canvas.getContext("2d");
+			width = canvas.width;
+			height = canvas.height;
+			bounce = 0.9;
+			for(var i=0; i<numberBalls; i++){
+				var rad = 25;
+				var x = width/2;
+				var y = height/2;
+				var vx = 10; //pixels per tick velocity
+				var vy = 10;
+				var color = "rgb(200, 0, 30)";
+				balls.push(new Ball(rad, x, y, vx, vy, color))
+			}
+			console.log(balls);
+			setInterval(game, 30);
+		})
 	</script>
 </body>
 
