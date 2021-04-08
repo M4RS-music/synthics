@@ -4,20 +4,21 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width-device-width, initial-scale=1">
 	<title>synthics</title>
-	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 	<header>
 	</header>
 	<div class="wrap">
-		<canvas id="scene" width="900" height="900" style="border-bottom-width: 1px;border-bottom-style: solid;border-left-width: 1px;border-left-style: solid;border-top-width: 1px;border-top-style: solid;border-right-width: 1px;border-right-style: solid;"></canvas>
+		<canvas id="scene" width="300" height="300" style="border-bottom-width: 1px;border-bottom-style: solid;border-left-width: 1px;border-left-style: solid;border-top-width: 1px;border-top-style: solid;border-right-width: 1px;border-right-style: solid;"></canvas>
 	</div>
 
 	<script>
 		//GLOBAL VARIABLES
-		var canvas, ctx, width, height, boxes = [], balls = [], numberBalls, drag, bounce, gravity;
+		var canvas, ctx, width, height, boxes = [], balls = [], numberBalls, drag, friction, bounce, gravity;
 		numberBalls = 1;
+		bounce = 0.9;
+		gravity = -0.2;
 		
 		//OBJECTS
 		function Ball(rad, x, y, vx, vy, color){
@@ -28,12 +29,14 @@
 			this.vy =vy;
 			this.color = color;
 			this.update = function(){
-				if(this.x <= 0 || this.x >= width) this.vx = -this.vx * bounce;
-				if(this.y <= 0 || this.y >= height) this.vy = -this.vy * bounce;
+				if(this.x-this.rad <= 0 || this.x+this.rad >= width) this.vx = collide(this.vx);
+				if(this.y-this.rad <= 0 || this.y+this.rad >= height) this.vy = collide(this.vy);
 				
-				this.x += this.vx;
-				this.y += this.vy;
-				console.log(this.y);
+				this.vy -= gravity; 
+				
+				if(this.x-this.rad+15 >= 0 && this.x+this.rad-15 <= width) this.x += this.vx; //trying to prevent ball from going outside border even partially
+				if(this.y-this.rad+15 >= 0 && this.y+this.rad-15 <= height) this.y += this.vy;
+				
 				//console.log("update");
 
 			}
@@ -61,18 +64,20 @@
 			}
 			
 		}
+		function collide(v){ //calculates the velocity/spin resulting from a collision
+			return -v * bounce;
+		}
 		//INIT
 		document.addEventListener("DOMContentLoaded", function(){
 			canvas = document.getElementById("scene");
 			ctx = canvas.getContext("2d");
 			width = canvas.width;
 			height = canvas.height;
-			bounce = 0.9;
 			for(var i=0; i<numberBalls; i++){
 				var rad = 25;
 				var x = width/2;
 				var y = height/2;
-				var vx = 10; //pixels per tick velocity
+				var vx = 15; //pixels per tick velocity
 				var vy = 10;
 				var color = "rgb(200, 0, 30)";
 				balls.push(new Ball(rad, x, y, vx, vy, color))
