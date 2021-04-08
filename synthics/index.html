@@ -17,8 +17,8 @@
 		//GLOBAL VARIABLES
 		var canvas, ctx, width, height, boxes = [], balls = [], numberBalls, drag, friction, bounce, gravity;
 		numberBalls = 1;
-		bounce = 0.9;
-		gravity = -0.2;
+		bounce = 0.95;
+		gravity = -0.1;
 		
 		//OBJECTS
 		function Ball(rad, x, y, vx, vy, color){
@@ -32,10 +32,18 @@
 				if(this.x-this.rad <= 0 || this.x+this.rad >= width) this.vx = collide(this.vx);
 				if(this.y-this.rad <= 0 || this.y+this.rad >= height) this.vy = collide(this.vy);
 				
+				
 				this.vy -= gravity; 
 				
-				if(this.x-this.rad+15 >= 0 && this.x+this.rad-15 <= width) this.x += this.vx; //trying to prevent ball from going outside border even partially
-				if(this.y-this.rad+15 >= 0 && this.y+this.rad-15 <= height) this.y += this.vy;
+				//if(this.x-this.rad+15 >= 0 && this.x+this.rad-15 <= width) 
+				this.x += this.vx; 
+				//if(this.y-this.rad-10 >= 0 && this.y+this.rad+10 <= height)
+				this.y += this.vy;
+				
+				//if(this.x-this.rad <= 0) this.x = 0 + this.rad;
+				//if(this.x+this.rad >= width) this.x = width - this.rad;
+				//if(this.y-this.rad <= 0) this.y = 0 + this.rad;
+				//if(this.y+this.rad <= height) this.y = height - this.rad;
 				
 				//console.log("update");
 
@@ -77,13 +85,13 @@
 				var rad = 25;
 				var x = width/2;
 				var y = height/2;
-				var vx = 15; //pixels per tick velocity
-				var vy = 10;
+				var vx = 5; //pixels per tick velocity
+				var vy = 3;
 				var color = "rgb(200, 0, 30)";
 				balls.push(new Ball(rad, x, y, vx, vy, color))
 			}
 			console.log(balls);
-			setInterval(game, 30);
+			setInterval(game, 10);
 		})
 	</script>
 </body>
