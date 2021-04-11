@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width-device-width, initial-scale=1">
-	<title>synthics balls</title>
+	<title>synthics pendulum</title>
 </head>
 
 <body>
@@ -15,21 +15,15 @@
 
 	<script>
 		//GLOBAL VARIABLES
-		var canvas, ctx, width, height, boxes = [], balls = [], numberBalls, drag, friction, bounce, gravity;
+		var canvas, ctx, width, height, magnets = [], weights, numberWeights, dampening, bounce, gravity;
 		numberBalls = 5;
 		bounce = 0.65;
 		gravity = -0.02;
-		drag = 0.005;
+		dampening = 0.005;
 		
 		//OBJECTS
-		function CollisionBox(w, h, x, y){
-			this.bwidth = w;
-			this.bheight = h;
-			this.x = x;
-			this.y = y;
-		}
 		
-		function Ball(i, rad, x, y, vx, vy, color, mass){
+		function Weight(i, rad, x, y, vx, vy, color, mass){
 			this.rad = rad;
 			this.x = x;
 			this.y = y;
@@ -55,10 +49,10 @@
 				}
 				
 				this.vy -= gravity; 
-				if(Math.sign(this.vx) == 1) this.vx -= drag;
-				if(Math.sign(this.vx) == -1) this.vx += drag;
-				if(Math.sign(this.vy) == 1) this.vy -= drag;
-				if(Math.sign(this.vy) == -1) this.vy += drag;
+				if(Math.sign(this.vx) == 1) this.vx -= dampening;
+				if(Math.sign(this.vx) == -1) this.vx += dampening;
+				if(Math.sign(this.vy) == 1) this.vy -= dampening;
+				if(Math.sign(this.vy) == -1) this.vy += dampening;
 				
 				//if(this.x-this.rad+15 >= 0 && this.x+this.rad-15 <= width) 
 				this.x += this.vx; 
