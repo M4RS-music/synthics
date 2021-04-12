@@ -36,12 +36,17 @@
 		    this.v += this.a;
 		    this.v *= dampening;
 		    this.angle += this.v;
-				this.position = [this.len * Math.sin(this.angle), this.len * Math.cos(this.angle), 0];
+				this.position = [this.len * Math.sin(this.angle), this.len * Math.cos(this.angle)];
 				this.position[0] += this.origin[0];
 				this.position[1] += this.origin[1];
 		  }
 
 		  this.render = function(ctx){
+				ctx.beginPath();
+				ctx.arc(this.origin[0], this.origin[1], 3, 0, Math.PI * 2);
+				ctx.fillStyle = "black";
+				ctx.closePath();
+				ctx.fill();
 
 				ctx.beginPath();
 				ctx.moveTo(this.origin[0], this.origin[1]);
@@ -49,8 +54,8 @@
 				ctx.stroke();
 				ctx.closePath();
 
-		   	ctx.beginPath();
-			  ctx.arc(this.position[0], this.position[1], this.rad, 0, Math.PI * 2);
+		   		ctx.beginPath();
+			 	ctx.arc(this.position[0], this.position[1], this.rad, 0, Math.PI * 2);
 				ctx.fillStyle = "rgba(200, 0, 90, 0.5)";
 				ctx.strokeStyle = "black";
 				ctx.closePath();
