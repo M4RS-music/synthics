@@ -21,47 +21,72 @@
 		dampening = 0.9;
 
 		//OBJECTS
+		function Magnet(x, y, r) {
+			this.position = [x, y];
+			this.rad = r;
+			this.strength = 0;
+			this.field = r;
+			
+			this.update = function(){
+				console.log(this);
+			}
+			
+			this.render = function(ctx){
+				ctx.beginPath();
+				ctx.arc(this.position[0], this.position[1], this.rad, 0, Math.PI * 2);
+				ctx.fillStyle = "rgba(200, 0, 190, 0.64)";
+				ctx.closePath();
+				ctx.fill();
+				
+				ctx.beginPath();
+				ctx.arc(this.position[0], this.position[1], this.field, 0, Math.PI * 2);
+				ctx.fillStyle = "rgba(200, 0, 200, 0.4)";
+				ctx.closePath();
+				ctx.fill();
+			}
+		}
+		
 		function Pendulum(x, y, len){
-	    this.origin = [x, y];
-	    this.position = [];
-	    this.len = len;
-	    this.angle = Math.PI / 4;
-	    this.v = 0.0;
-	    this.a = 0.0;
-	    this.rad = 25;
+			this.origin = [x, y];
+			this.position = [];
+			this.len = len;
+			this.angle = Math.PI / 4;
+			this.v = 0.0;
+			this.a = 0.0;
+			this.rad = 25;
 
 
-		  this.update = function(){
-		    this.a = (gravity / this.len) * Math.sin(this.angle);
-		    this.v += this.a;
-		    this.v *= dampening;
-		    this.angle += this.v;
+			this.update = function(){
+				this.a = (gravity / this.len) * Math.sin(this.angle);
+				this.v += this.a;
+				this.v *= dampening;
+				this.angle += this.v;
 				this.position = [this.len * Math.sin(this.angle), this.len * Math.cos(this.angle)];
 				this.position[0] += this.origin[0];
 				this.position[1] += this.origin[1];
-		  }
-
-		  this.render = function(ctx){
-				ctx.beginPath();
-				ctx.arc(this.origin[0], this.origin[1], 3, 0, Math.PI * 2);
-				ctx.fillStyle = "black";
-				ctx.closePath();
-				ctx.fill();
-
-				ctx.beginPath();
-				ctx.moveTo(this.origin[0], this.origin[1]);
-				ctx.lineTo(this.position[0], this.position[1]);
-				ctx.stroke();
-				ctx.closePath();
-
-		   		ctx.beginPath();
-			 	ctx.arc(this.position[0], this.position[1], this.rad, 0, Math.PI * 2);
-				ctx.fillStyle = "rgba(200, 0, 90, 0.5)";
-				ctx.strokeStyle = "black";
-				ctx.closePath();
-				ctx.fill();
-		  }
-	}
+			  }
+			
+			  this.render = function(ctx){
+					ctx.beginPath();
+					ctx.arc(this.origin[0], this.origin[1], 3, 0, Math.PI * 2);
+					ctx.fillStyle = "black";
+					ctx.closePath();
+					ctx.fill();
+	
+					ctx.beginPath();
+					ctx.moveTo(this.origin[0], this.origin[1]);
+					ctx.lineTo(this.position[0], this.position[1]);
+					ctx.stroke();
+					ctx.closePath();
+	
+					ctx.beginPath();
+					ctx.arc(this.position[0], this.position[1], this.rad, 0, Math.PI * 2);
+					ctx.fillStyle = "rgba(200, 0, 90, 0.5)";
+					ctx.strokeStyle = "black";
+					ctx.closePath();
+					ctx.fill();
+			  }
+		}
 
 
 
@@ -74,7 +99,12 @@
 			clear();
 			pend.update();
 			pend.render(ctx);
-			console.log(pend);
+			for(var i; i<magnets.length; i++){
+				var mag = magnets[i];
+				console.log(mag);
+				mag.update();
+				mag.render(ctx);
+			}
 
 		}
 
@@ -95,7 +125,25 @@
 			width = canvas.width;
 			height = canvas.height;
 			pend = new Pendulum(150, 20, 200);
-
+			for(var i=0; i<3; i++){
+				var r = 20;
+				var x = randIntRange(r, width - r);
+				var y = randIntRange(r, height - r);
+				
+				if(i !== 0){ //randomly generate new position for ball if ball is inside another
+					for(var z; z < magnets.length; z++){
+						var binit = magnets[z];
+						if(getDistance(x, y, binit.x, binit.y) < r + binit.rad){
+							x = randIntRange(r, width - r);
+							y = randIntRange(r, height - r);
+							z = -1;
+						}
+					}
+				}
+				
+				magnets.push(new Magnet(x, y, r));
+				console.log(magnets)
+			}
 			setInterval(game, 20);
 		})
 	</script>
