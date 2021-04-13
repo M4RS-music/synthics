@@ -15,11 +15,12 @@
 
 	<script>
 		//GLOBAL VARIABLES
-		var canvas, ctx, width, height, magnets = [], dampening, bounce, gravity, pend, dragOk;
+		var canvas, ctx, width, height, magnets = [], numberMagnets, dampening, bounce, gravity, pend, dragOk, beingDragged;
 		bounce = 0.65;
 		gravity = -3;
 		dampening = 0.98;
 		dragOk = false;
+		numberMagnets = 3;
 
 		//OBJECTS
 		function Magnet(x, y, r) {
@@ -121,10 +122,17 @@
 		}
 
 		function mouseDown(mouse){
-			console.log(mouse);
+			console.log(mouse.clientX);
+			for(var i = 0; i<numberMagnets; i++){
+				var mag = magnets[i];
+				if(mag.position[0]-mag.rad+canvas.offsetLeft <= mouse.clientX <= mag.position[0]+mag.rad+canvas.offsetLeft &&
+					mag.position[1]-mag.rad+canvas.offsetTop <= mouse.clientY <= mag.position[1]+mag.rad+canvas.offsetTop){
+					console.log(i);
+				}
+			}
 		}
 
-		function mouseDrag(mouse, mag){
+		function mouseDrag(mouse){
 
 		}
 
@@ -139,7 +147,7 @@
 			width = canvas.width;
 			height = canvas.height;
 			pend = new Pendulum(150, 20, 200);
-			for(var i=0; i<3; i++){
+			for(var i=0; i<numberMagnets; i++){
 				var r = 10;
 				var x = randIntRange(r, width - r);
 				var y = randIntRange(r, height - r);
