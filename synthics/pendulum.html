@@ -15,20 +15,21 @@
 
 	<script>
 		//GLOBAL VARIABLES
-		var canvas, ctx, width, height, magnets = [], dampening, bounce, gravity, pend;
+		var canvas, ctx, width, height, magnets = [], dampening, bounce, gravity, pend, dragOk;
 		bounce = 0.65;
 		gravity = -3;
-		dampening = 0.9;
+		dampening = 0.98;
+		dragOk = false;
 
 		//OBJECTS
 		function Magnet(x, y, r) {
 			this.position = [x, y];
 			this.rad = r;
 			this.strength = 0;
-			this.field = r;
+			this.field = r*2;
 
 			this.update = function(){
-				console.log(this);
+
 			}
 
 			this.render = function(ctx){
@@ -99,12 +100,13 @@
 			clear();
 			pend.update();
 			pend.render(ctx);
-			for(var i; i<magnets.length; i++){
+			for(var i=0; i<magnets.length; i++){
 				var mag = magnets[i];
-				console.log(mag);
 				mag.update();
 				mag.render(ctx);
 			}
+			canvas.onmousedown = mouseDown;
+			canvas.onmouseup = mouseUp;
 
 		}
 
@@ -118,6 +120,18 @@
 			return Math.floor(Math.random() * (max - min +1) +min);
 		}
 
+		function mouseDown(mouse){
+			console.log(mouse);
+		}
+
+		function mouseDrag(mouse, mag){
+
+		}
+
+		function mouseUp(mouse){
+			console.log(mouse);
+		}
+
 		//INIT
 		document.addEventListener("DOMContentLoaded", function(){
 			canvas = document.getElementById("scene");
@@ -126,7 +140,7 @@
 			height = canvas.height;
 			pend = new Pendulum(150, 20, 200);
 			for(var i=0; i<3; i++){
-				var r = 20;
+				var r = 10;
 				var x = randIntRange(r, width - r);
 				var y = randIntRange(r, height - r);
 
@@ -142,7 +156,6 @@
 				}
 
 				magnets.push(new Magnet(x, y, r));
-				console.log(magnets)
 			}
 			setInterval(game, 20);
 		})
