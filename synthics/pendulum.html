@@ -126,17 +126,23 @@
 			for(var i = 0; i<numberMagnets; i++){
 				var mag = magnets[i];
 				if(getDistance(mag.position[0]+canvas.offsetLeft, mag.position[1]+canvas.offsetTop, mouse.clientX, mouse.clientY) <= mag.rad){
-					console.log(i);
+					dragOk = true;
+					beingDragged = i;
+  				canvas.onmousemove = mouseDrag;
 				}
 			}
 		}
 
 		function mouseDrag(mouse){
-
+			if (dragOk){
+			  magnets[beingDragged].position[0] =	mouse.clientX - canvas.offsetLeft;
+			  magnets[beingDragged].position[1] = mouse.clientY - canvas.offsetTop;
+			 }
 		}
 
 		function mouseUp(mouse){
-			console.log(mouse);
+			dragOk = false;
+			beingDragged = null;
 		}
 
 		//INIT
