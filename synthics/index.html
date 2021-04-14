@@ -15,19 +15,78 @@
 
 	<script>
 		//GLOBAL VARIABLES
-		var canvas, ctx, width, height, boxes = [], balls = [], numberBalls, drag, friction, bounce, gravity;
+		var canvas, ctx, width, height, boxes = [], numberBoxes, balls = [], numberBalls, drag, dragOk, beingDragged, friction, bounce, gravity;
 		numberBalls = 5;
+		numberBoxes = 1;
 		bounce = 0.65;
 		gravity = -0.02;
 		drag = 0.005;
 		friction = 0.04;
+		dragOk = false;
+		beingDragged = null;
 
 		//OBJECTS
-		function CollisionBox(w, h, x, y){
-			this.bwidth = w;
-			this.bheight = h;
-			this.x = x;
-			this.y = y;
+		function CollisionBox(x, y, w, h){
+			this.position = [x, y];
+			this.size = [w, h];
+			this.corners = [[], [], [], []];
+
+			this.calculateCorners = function(){
+				var w = this.size[0] / 2;
+				var	h = this.size[1] / 2;
+				var x = this.position[0] + w;
+				var y = this.position[1] + h;
+
+				this.corners[0][0] = x - w;
+				this.corners[0][1] = y - h;
+				this.corners[1][0] = x + w;
+				this.corners[1][1] = y - h;
+				this.corners[2][0] = x - w;
+				this.corners[2][1] = y + h;
+				this.corners[3][0] = x + w;
+				this.corners[3][1] = y + h;
+
+			}
+
+
+			this.render = function(ctx){
+				//Draw BOX
+				ctx.beginPath();
+				ctx.fillStyle = "rgba(10, 10, 10, 0.2)";
+				ctx.strokeStyle = "rgba(1, 1, 1, 0.5)";
+				ctx.rect(this.position[0], this.position[1], this.size[0], this.size[1]);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+
+				//Draw Top Left Corner
+				ctx.beginPath();
+				ctx.fillStyle = "rgba(120, 1, 60, 0.6)";
+				ctx.arc(this.corners[0][0], this.corners[0][1], 7, 0, Math.PI * 2);
+				ctx.closePath();
+				ctx.fill();
+
+				//Draw Top Right Corner
+				ctx.beginPath();
+				ctx.fillStyle = "rgba(120, 1, 60, 0.6)";
+				ctx.arc(this.corners[1][0], this.corners[1][1], 7, 0, Math.PI * 2);
+				ctx.closePath();
+				ctx.fill();
+
+				//Draw Bottom Left Corner
+				ctx.beginPath();
+				ctx.fillStyle = "rgba(120, 1, 60, 0.6)";
+				ctx.arc(this.corners[2][0], this.corners[2][1], 7, 0, Math.PI * 2);
+				ctx.closePath();
+				ctx.fill();
+
+				//Draw Bottom Right Corner
+				ctx.beginPath();
+				ctx.fillStyle = "rgba(100, 1, 60, 0.6)";
+				ctx.arc(this.corners[3][0], this.corners[3][1], 7, 0, Math.PI * 2);
+				ctx.closePath();
+				ctx.fill();
+			}
 		}
 
 		function Ball(i, rad, x, y, vx, vy, color, mass){
@@ -96,6 +155,13 @@
 				b.update();
 				b.render(ctx);
 			}
+			for(var i=0; i<numberBoxes; i++){
+				var b = boxes[i];
+				b.calculateCorners();
+				b.render(ctx);
+			}
+			canvas.onmousedown = mouseDown;
+			canvas.onmouseup = mouseUp;
 		}
 
 		function collidex(v, ball){ //calculates the velocity/spin resulting from a collision with wall
@@ -168,6 +234,44 @@
 			return Math.floor(Math.random() * (max - min +1) +min);
 		}
 
+		///Click and Drag
+		function mouseDown(mouse){
+			for(var i = 0; i<numberBoxes; i++){
+				var box = boxes[i];
+				for(var c = -1; c < 4; c++){
+					if(c == -1){
+						var x = box.position[0]+canvas.offsetLeft;
+						var y = box.position[1]+canvas.offsetTop;
+						var w = box.w/2;
+						var h = box.h/2;
+						if(mouse.clientX <= x + w - 7 && mouse.clientX >= x - w + 7){
+							if(mouse.clientY <= y + h - 7 && mouse.clientY >= y - h + 7){
+								beingDragged = [-1, i];
+								dragOk = true;
+								canvas.onmousemove = mouseDrag;
+							}
+						}
+					}
+					else if(getDistance(box.corners[c][0]+canvas.offsetLeft, box.corners[c][1].offsetTop, mouse.clientX, mouse.clientY) <= 7){
+						dragOk = true;
+						beingDragged = [c, i];
+	  				canvas.onmousemove = mouseDrag;
+					}
+				}
+			}
+		}
+
+		function mouseDrag(mouse){
+			if (dragOk){
+				console.log(beingDragged);
+			 }
+		}
+
+		function mouseUp(mouse){
+			dragOk = false;
+			beingDragged = null;
+		}
+
 		//INIT
 		document.addEventListener("DOMContentLoaded", function(){
 			canvas = document.getElementById("scene");
@@ -195,6 +299,9 @@
 				}
 
 				balls.push(new Ball(i, rad, x, y, vx, vy, color, mass))
+			}
+			for(var i = 0; i < numberBoxes; i++){
+				boxes.push(new CollisionBox(50, 50, 50, 50));
 			}
 			//console.log(balls);
 			setInterval(game, 10);

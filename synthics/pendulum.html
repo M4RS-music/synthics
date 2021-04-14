@@ -122,7 +122,6 @@
 		}
 
 		function mouseDown(mouse){
-			//console.log(mouse.clientX);
 			for(var i = 0; i<numberMagnets; i++){
 				var mag = magnets[i];
 				if(getDistance(mag.position[0]+canvas.offsetLeft, mag.position[1]+canvas.offsetTop, mouse.clientX, mouse.clientY) <= mag.rad){
