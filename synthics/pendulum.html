@@ -9,13 +9,14 @@
 <body>
 	<header>
 	</header>
+	<button id="PlayPause">Play Pause</button>
 	<div class="wrap">
 		<canvas id="scene" width="300" height="300" style="border-bottom-width: 1px;border-bottom-style: solid;border-left-width: 1px;border-left-style: solid;border-top-width: 1px;border-top-style: solid;border-right-width: 1px;border-right-style: solid;"></canvas>
 	</div>
 
 	<script>
 		//GLOBAL VARIABLES
-		var canvas, ctx, width, height, magnets = [], numberMagnets, dampening, bounce, gravity, pend, dragOk, beingDragged;
+		var canvas, ctx, width, height, magnets = [], numberMagnets, dampening, bounce, gravity, pend, dragOk, beingDragged, mouseInit, radInit;
 		bounce = 0.65;
 		gravity = -3;
 		dampening = 0.98;
@@ -124,15 +125,33 @@
 		function mouseDown(mouse){
 			for(var i = 0; i<numberMagnets; i++){
 				var mag = magnets[i];
-				if(getDistance(mag.position[0]+canvas.offsetLeft, mag.position[1]+canvas.offsetTop, mouse.clientX, mouse.clientY) <= mag.rad){
+				var dmouse = getDistance(mag.position[0]+canvas.offsetLeft, mag.position[1]+canvas.offsetTop, mouse.clientX, mouse.clientY);
+				if(dmouse <= mag.rad){
 					dragOk = true;
 					beingDragged = i;
-  				canvas.onmousemove = mouseDrag;
+  				canvas.onmousemove = mouseDragPos;
+					break;
+				}
+				else if(dmouse < mag.field){
+					console.log(dmouse);
+					console.log(mag.field);
+					dragOk = true;
+					beingDragged = i;
+					mouseInit = [mouse.clientX, mouse.clientY];
+					radInit = mag.field;
+  				canvas.onmousemove = mouseDragField;
+					break;
 				}
 			}
 		}
 
-		function mouseDrag(mouse){
+		function mouseDragField(mouse){
+			if (dragOk){
+				magnets[beingDragged].field = getDistance(mouseInit[0], mouseInit[1], mouse.clientX, mouse.clientY);
+				}
+		}
+
+		function mouseDragPos(mouse){
 			if (dragOk){
 			  magnets[beingDragged].position[0] =	mouse.clientX - canvas.offsetLeft;
 			  magnets[beingDragged].position[1] = mouse.clientY - canvas.offsetTop;

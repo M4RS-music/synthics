@@ -15,12 +15,12 @@
 
 	<script>
 		//GLOBAL VARIABLES
-		var canvas, ctx, width, height, boxes = [], numberBoxes, balls = [], numberBalls, drag, dragOk, beingDragged, friction, bounce, gravity;
-		numberBalls = 5;
+		var canvas, ctx, width, height, boxes = [], numberBoxes, balls = [], numberBalls, drag, dragOk, beingDragged, friction, bounce, gravity, posBeforeClick;
+		numberBalls = 4;
 		numberBoxes = 1;
-		bounce = 0.65;
-		gravity = -0.02;
-		drag = 0.005;
+		bounce = 0.9;
+		gravity = -0.09;
+		drag = 0.001;
 		friction = 0.04;
 		dragOk = false;
 		beingDragged = null;
@@ -29,6 +29,10 @@
 		function CollisionBox(x, y, w, h){
 			this.position = [x, y];
 			this.size = [w, h];
+			this.x = x;
+			this.y = y;
+			this.h = h;
+			this.w = w;
 			this.corners = [[], [], [], []];
 
 			this.calculateCorners = function(){
@@ -99,6 +103,7 @@
 			this.i = i;
 			this.spin = 0;
 			this.mass = mass;
+			this.pastCollide = false;
 
 			this.update = function(){
 				if(this.x-this.rad <= 0 || this.x+this.rad >= width) this.vx = collidex(this.vx, this);
@@ -108,9 +113,11 @@
 				for(var i=0; i<numberBalls; i++){
 					if(i !== this.i){
 						var b = balls[i];
+
 						if(getDistance(this.x, this.y, b.x, b.y) <= this.rad+b.rad)
 							{
-							solveElasticCollision(this, b);
+							//console.log(getDistance(this.x, this.y, b.x, b.y));
+								solveElasticCollision(this, b);
 							}}
 				}
 
@@ -201,7 +208,7 @@
 			var vxDiff = p1.vx - p2.vx;
 			var vyDiff = p1.vy - p2.vy;
 			var xD = p2.x - p1.x;
-			var yD = p2.y - p2.y;
+			var yD = p2.y - p1.y;
 
 			if(vxDiff * xD + vyDiff * yD >= 0){
 				var angle = -Math.atan2(p2.y-p1.y, p2.x-p1.x);
@@ -221,8 +228,14 @@
 				p1.vy = vF1.y;
 				p2.vx = vF2.x;
 				p2.vy = vF2.y;
-			}
+
+		}}
+
+		function solveBoxCollision(ball, box){
+
 		}
+
+
 
 		function getDistance(x1, y1, x2, y2){
 			var xD = x1-x2;
@@ -236,27 +249,37 @@
 
 		///Click and Drag
 		function mouseDown(mouse){
+			var cx = mouse.clientX-canvas.offsetLeft;
+			var cy = mouse.clientY-canvas.offsetTop;
 			for(var i = 0; i<numberBoxes; i++){
 				var box = boxes[i];
 				for(var c = -1; c < 4; c++){
 					if(c == -1){
-						var x = box.position[0]+canvas.offsetLeft;
-						var y = box.position[1]+canvas.offsetTop;
-						var w = box.w/2;
-						var h = box.h/2;
-						if(mouse.clientX <= x + w - 7 && mouse.clientX >= x - w + 7){
-							if(mouse.clientY <= y + h - 7 && mouse.clientY >= y - h + 7){
+						var x = box.position[0];
+						var y = box.position[1];
+						var w = box.size[0];
+						var h = box.size[1];
+
+						//console.log(mouse.clientX);
+						//console.log(typeof x);
+						//console.log(x + w - 7);
+
+						if(cx <= x + w - 7 && cx >= x + 7){
+							//console.log("box x");
+							if(cy <= y + h - 7 && cy >= y + 7){
+							//	console.log("box y");
 								beingDragged = [-1, i];
 								dragOk = true;
 								canvas.onmousemove = mouseDrag;
+								}
 							}
 						}
-					}
-					else if(getDistance(box.corners[c][0]+canvas.offsetLeft, box.corners[c][1].offsetTop, mouse.clientX, mouse.clientY) <= 7){
-						dragOk = true;
-						beingDragged = [c, i];
-	  				canvas.onmousemove = mouseDrag;
-					}
+						else if(getDistance(box.corners[c][0], box.corners[c][1], cx, cy) <= 7){
+							dragOk = true;
+							beingDragged = [c, i];
+							posBeforeClick = [cx, box.size[0], cy, box.size[1]];
+		  				canvas.onmousemove = mouseDrag;
+						}
 				}
 			}
 		}
@@ -264,12 +287,21 @@
 		function mouseDrag(mouse){
 			if (dragOk){
 				console.log(beingDragged);
+				if (beingDragged[0] == -1){
+					boxes[beingDragged[1]].position[0] = mouse.clientX - canvas.offsetLeft - boxes[beingDragged[1]].size[0]/2;
+					boxes[beingDragged[1]].position[1] = mouse.clientY - canvas.offsetTop - boxes[beingDragged[1]].size[1]/2;
+				}
+				if (beingDragged[0] == 3){
+					boxes[beingDragged[1]].size[0] = posBeforeClick[1] + (mouse.clientX - canvas.offsetLeft - posBeforeClick[0]);
+					boxes[beingDragged[1]].size[1] = posBeforeClick[3] + (mouse.clientY - canvas.offsetTop - posBeforeClick[2]);
+				}
 			 }
 		}
 
 		function mouseUp(mouse){
 			dragOk = false;
 			beingDragged = null;
+			posBeforeClick = null;
 		}
 
 		//INIT
