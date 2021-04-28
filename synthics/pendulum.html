@@ -147,6 +147,7 @@
 
 		function mouseDragField(mouse){
 			if (dragOk){
+				if (getDistance(mouseInit[0], mouseInit[1], mouse.clientX, mouse.clientY) > magnets[beingDragged].rad + 5)
 				magnets[beingDragged].field = getDistance(mouseInit[0], mouseInit[1], mouse.clientX, mouse.clientY);
 				}
 		}
