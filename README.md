@@ -1,2 +1,2 @@
 # synthics
-A Max For Live sythesizer designed for the sonic exploration of simulated physics
+Web App physics simulations used in the implementation of synthics_m4l
